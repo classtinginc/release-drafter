@@ -31,7 +31,7 @@ module.exports = (app) => {
     const ref = context.payload.ref
     const masterRef = 'refs/heads/master'
 
-    if (!isTriggerableReference({ masterRef, app, context, config })) {
+    if (!isTriggerableReference({ ref:masterRef, app, context, config })) {
       return
     }
 
@@ -46,8 +46,8 @@ module.exports = (app) => {
     } = await findCommitsWithAssociatedPullRequests({
       app,
       context,
-      masterRef,
-      basisRelease,
+      ref: masterRef,
+      lastRelease: basisRelease,
       config,
     })
 
@@ -60,7 +60,7 @@ module.exports = (app) => {
     const releaseInfo = generateReleaseInfo({
       commits,
       config,
-      basisRelease,
+      lastRelease: basisRelease,
       mergedPullRequests: sortedMergedPullRequests,
       version,
       tag,
