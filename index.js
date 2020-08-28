@@ -31,7 +31,7 @@ module.exports = (app) => {
     const ref = context.payload.ref
     const masterRef = 'refs/heads/master'
 
-    if (!isTriggerableReference({ ref, app, context, config })) {
+    if (!isTriggerableReference({ masterRef, app, context, config })) {
       return
     }
 
@@ -46,7 +46,7 @@ module.exports = (app) => {
     } = await findCommitsWithAssociatedPullRequests({
       app,
       context,
-      ref,
+      masterRef,
       basisRelease,
       config,
     })
