@@ -27,13 +27,19 @@ module.exports = (app) => {
 
     // GitHub Actions merge payloads slightly differ, in that their ref points
     // to the PR branch instead of refs/heads/master
-    const ref = 'refs/heads/master'
+    // context.payload.ref
+    const ref = context.payload.ref
+    const masterRef = 'refs/heads/master'
 
     if (!isTriggerableReference({ ref, app, context, config })) {
       return
     }
 
-    const { draftRelease, lastRelease } = await findReleases({ app, context })
+    const { draftRelease, lastRelease, lastPreRelease } = await findReleases({ app, context })
+    let basisRelease = lastRelease;
+    if(ref !== masterRef) {
+      basisRelease = lastPreRelease;
+    }
     const {
       commits,
       pullRequests: mergedPullRequests,
@@ -41,7 +47,7 @@ module.exports = (app) => {
       app,
       context,
       ref,
-      lastRelease,
+      basisRelease,
       config,
     })
 
@@ -54,7 +60,7 @@ module.exports = (app) => {
     const releaseInfo = generateReleaseInfo({
       commits,
       config,
-      lastRelease,
+      basisRelease,
       mergedPullRequests: sortedMergedPullRequests,
       version,
       tag,
